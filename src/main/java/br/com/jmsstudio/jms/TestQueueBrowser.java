@@ -2,12 +2,13 @@ package br.com.jmsstudio.jms;
 
 import javax.jms.*;
 import javax.naming.InitialContext;
+import java.util.Enumeration;
 import java.util.Scanner;
 
-public class TestConsumer {
+public class TestQueueBrowser {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Running message consumer");
+        System.out.println("Running queue browser");
         InitialContext context = new InitialContext();
 
         ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup("ConnectionFactory");
@@ -18,17 +19,14 @@ public class TestConsumer {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination filaFinanceiro = (Destination) context.lookup("financeiro");
 
-        MessageConsumer consumer = session.createConsumer(filaFinanceiro);
+        QueueBrowser browser = session.createBrowser((Queue) filaFinanceiro);
 
-        consumer.setMessageListener(message -> {
-            TextMessage textMessage = (TextMessage) message;
-            try {
-                System.out.println("Recebida mensagem: " + textMessage.getText());
-            } catch (JMSException e) {
-                e.printStackTrace();
-            }
-        });
+        Enumeration enumeration = browser.getEnumeration();
 
+        while (enumeration.hasMoreElements()) {
+            TextMessage msg = (TextMessage) enumeration.nextElement();
+            System.out.println("> Mensagem encontrada sem ser consumida: " + msg.getText());
+        }
 
         new Scanner(System.in).nextLine();
 
