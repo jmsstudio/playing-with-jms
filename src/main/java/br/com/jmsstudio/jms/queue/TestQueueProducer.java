@@ -1,13 +1,13 @@
-package br.com.jmsstudio.jms;
+package br.com.jmsstudio.jms.queue;
 
 import javax.jms.*;
 import javax.naming.InitialContext;
 import java.util.Scanner;
 
-public class TestConsumer {
+public class TestQueueProducer {
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Running message consumer");
+        System.out.println("Running message producer");
         InitialContext context = new InitialContext();
 
         ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup("ConnectionFactory");
@@ -18,19 +18,11 @@ public class TestConsumer {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Destination filaFinanceiro = (Destination) context.lookup("financeiro");
 
-        MessageConsumer consumer = session.createConsumer(filaFinanceiro);
+        MessageProducer producer = session.createProducer(filaFinanceiro);
 
-        consumer.setMessageListener(message -> {
-            TextMessage textMessage = (TextMessage) message;
-            try {
-                System.out.println("Recebida mensagem: " + textMessage.getText());
-            } catch (JMSException e) {
-                e.printStackTrace();
-            }
-        });
-
-
-        new Scanner(System.in).nextLine();
+        for (int i = 0; i < 1000; i++) {
+            producer.send(session.createTextMessage("Message " + (i+1)));
+        }
 
         session.close();
         connection.close();

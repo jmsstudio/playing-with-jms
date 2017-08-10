@@ -1,4 +1,4 @@
-package br.com.jmsstudio.jms;
+package br.com.jmsstudio.jms.queue;
 
 import javax.jms.*;
 import javax.naming.InitialContext;
