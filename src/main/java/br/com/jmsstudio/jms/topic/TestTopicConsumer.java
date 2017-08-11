@@ -18,7 +18,11 @@ public class TestTopicConsumer {
         Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         Topic topicStore = (Topic) context.lookup("store");
 
-        MessageConsumer consumer = session.createDurableSubscriber(topicStore, "Store Consumer");
+        //consume apenas mensagens que atendam a restrição
+        MessageConsumer consumer = session.createDurableSubscriber(topicStore, "Store Consumer", "ebook = false OR ebook is null", false);
+
+        //consume todas as mensagens
+//        MessageConsumer consumer = session.createDurableSubscriber(topicStore, "Store Consumer");
 
         consumer.setMessageListener(message -> {
             TextMessage textMessage = (TextMessage) message;
