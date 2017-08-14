@@ -1,5 +1,7 @@
 package br.com.jmsstudio.jms.topic;
 
+import br.com.jmsstudio.jms.model.Pedido;
+
 import javax.jms.*;
 import javax.naming.InitialContext;
 import java.util.Scanner;
@@ -8,6 +10,8 @@ public class TestTopicConsumer {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Running topic consumer");
+        System.setProperty("org.apache.activemq.SERIALIZABLE_PACKAGES", "*");
+
         InitialContext context = new InitialContext();
 
         ConnectionFactory connectionFactory = (ConnectionFactory) context.lookup("ConnectionFactory");
@@ -25,9 +29,15 @@ public class TestTopicConsumer {
 //        MessageConsumer consumer = session.createDurableSubscriber(topicStore, "Store Consumer");
 
         consumer.setMessageListener(message -> {
-            TextMessage textMessage = (TextMessage) message;
             try {
-                System.out.println("Recebida mensagem: " + textMessage.getText());
+                try {
+                    TextMessage textMessage = (TextMessage) message;
+                    System.out.println("Recebida mensagem: " + textMessage.getText());
+                } catch (ClassCastException cce) {
+                    ObjectMessage objectMessage = (ObjectMessage) message;
+                    Pedido pedidoDeserialized = (Pedido) objectMessage.getObject();
+                    System.out.println("Recebida mensagem: Pedido #" + pedidoDeserialized.getCodigo());
+                }
             } catch (JMSException e) {
                 e.printStackTrace();
             }

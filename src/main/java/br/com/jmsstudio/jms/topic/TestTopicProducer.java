@@ -35,8 +35,11 @@ public class TestTopicProducer {
             }
         });
 
-        Message produtoXmlMessage = createProdutoXmlMessage(session);
-        producer.send(produtoXmlMessage);
+        Message pedidoXmlMessage = createPedidoXmlMessage(session);
+        producer.send(pedidoXmlMessage);
+
+        Message pedidoObjectMessage = createPedidoObjectMessage(session);
+        producer.send(pedidoObjectMessage);
 
         session.close();
         connection.close();
@@ -54,7 +57,7 @@ public class TestTopicProducer {
         return messages;
     }
 
-    private static Message createProdutoXmlMessage(Session session) throws JMSException {
+    private static Message createPedidoXmlMessage(Session session) throws JMSException {
         Pedido pedido = new PedidoFactory().geraPedidoComValores();
         StringWriter stringWriter = new StringWriter();
 
@@ -64,4 +67,11 @@ public class TestTopicProducer {
 
         return session.createTextMessage(xml);
     }
+
+    private static Message createPedidoObjectMessage(Session session) throws JMSException {
+        Pedido pedido = new PedidoFactory().geraPedidoComValores();
+        return session.createObjectMessage(pedido);
+    }
+
+
 }
